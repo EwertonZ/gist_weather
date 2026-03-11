@@ -1,40 +1,20 @@
-from pydantic import BaseModel, Field
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from fastapi.routing import APIRouter
-from config import OPENWEATHER_API_KEY, GITHUB_TOKEN
 from services.weather_service import WeatherService
 from services.gist_service import GistService
+from schemas.gist import GistCommentRequest
+from api.dependencies.services import (
+    get_weather_service,
+    get_gist_service,
+)
 from api.docs.gist_docs import (
     COMMENT_ON_GIST_SUMMARY,
     COMMENT_ON_GIST_DESCRIPTION,
     COMMENT_ON_GIST_RESPONSES,
 )
 
-weather_service = WeatherService(OPENWEATHER_API_KEY)
-gist_service = GistService(GITHUB_TOKEN)
-router: APIRouter = APIRouter(prefix="/gist", tags=["gist"])
 
-class GistCommentRequest(BaseModel):
-    gist_id: str = Field(
-        ..., 
-        description="The ID of the GitHub Gist to comment on.",
-        examples=["aa5a315d61ae9438b18d"]
-    )
-    city: str = Field(
-        ...,
-        description="The name of the city for which to retrieve weather information.",
-        examples=["São Paulo"]
-    )
-    country_code: str | None = Field(
-        None,
-        description="The country code (ISO 3166-1 alpha-2) for more accurate location matching.",
-        examples=["BR"]
-    )
-    state_code: str | None = Field(
-        None,
-        description="The state code (ISO 3166-2) for more accurate location matching.",
-        examples=["SP"]
-    )
+router: APIRouter = APIRouter(prefix="/gist", tags=["gist"])
 
 @router.post(
         "/comment",
@@ -42,7 +22,11 @@ class GistCommentRequest(BaseModel):
         description=COMMENT_ON_GIST_DESCRIPTION,
         responses=COMMENT_ON_GIST_RESPONSES # pyright: ignore[reportArgumentType]
 )
-async def comment_on_gist(request: GistCommentRequest):
+async def comment_on_gist(
+    request: GistCommentRequest,
+    weather_service: WeatherService = Depends(get_weather_service),
+    gist_service: GistService = Depends(get_gist_service),
+):
     """
     Comment on a GitHub Gist with the current weather information for a specified location.
     """
