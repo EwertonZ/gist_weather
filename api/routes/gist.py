@@ -45,7 +45,7 @@ async def comment_on_gist(
 
         gist_service.create_comment(gist_id=request.gist_id, comment=weather_summary)
 
-        return {"message": f"Commented on Gist {request.gist_id} with weather summary: {weather_summary}"}
+        return {"message": "Comment created successfully"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except PermissionError as e:
