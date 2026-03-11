@@ -8,6 +8,10 @@ from openweather_sdk import (
 from config import OPENWEATHER_API_KEY
 
 class WeatherService:
+    """
+    Service class responsible for interacting with the OpenWeather API to retrieve current weather information, forecasts
+    and generate weather summaries for specified locations.
+    """
     def __init__(self, api_key: str = OPENWEATHER_API_KEY):
         self.client = OpenWeatherClient(api_key)
     
@@ -94,15 +98,16 @@ class WeatherService:
         forecast_summary = ", ".join(forecast_parts)
 
         markdown_summary =f"""
-            ### {datetime.now().strftime('%d/%m')} ![Weather Icon](https://openweathermap.org/img/wn/{weather_data.icon}@2x.png)
+![Weather Icon](https://openweathermap.org/img/wn/{weather_data.icon}.png) 
 
+### Temperatura atual para {datetime.now().strftime('%d/%m')}
 
-            {current_temp}°C e {weather_data.description.lower()} em {city.capitalize()}.
+{current_temp}°C e {weather_data.description.lower()} em {city.capitalize()}.
 
-            ### Previsão para os próximos dias
+### Previsão para os próximos dias
 
-            {forecast_summary}.
-            """.strip()
+{forecast_summary}.
+"""
         
         return markdown_summary
 

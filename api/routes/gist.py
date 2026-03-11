@@ -1,9 +1,17 @@
 from pydantic import BaseModel, Field
+from fastapi import HTTPException
 from fastapi.routing import APIRouter
+from config import OPENWEATHER_API_KEY, GITHUB_TOKEN
 from services.weather_service import WeatherService
-from config import OPENWEATHER_API_KEY
+from services.gist_service import GistService
+from api.docs.gist_docs import (
+    COMMENT_ON_GIST_SUMMARY,
+    COMMENT_ON_GIST_DESCRIPTION,
+    COMMENT_ON_GIST_RESPONSES,
+)
 
 weather_service = WeatherService(OPENWEATHER_API_KEY)
+gist_service = GistService(GITHUB_TOKEN)
 router: APIRouter = APIRouter(prefix="/gist", tags=["gist"])
 
 class GistCommentRequest(BaseModel):
@@ -28,16 +36,39 @@ class GistCommentRequest(BaseModel):
         examples=["SP"]
     )
 
-@router.post("/comment")
+@router.post(
+        "/comment",
+        summary=COMMENT_ON_GIST_SUMMARY,
+        description=COMMENT_ON_GIST_DESCRIPTION,
+        responses=COMMENT_ON_GIST_RESPONSES # pyright: ignore[reportArgumentType]
+)
 async def comment_on_gist(request: GistCommentRequest):
     """
     Comment on a GitHub Gist with the current weather information for a specified location.
     """
-    weather_summary = weather_service.get_weather_summary(
-        city=request.city,
-        country_code=request.country_code,
-        state_code=request.state_code
-    )
+    try:
 
-    return {"message": f"Commented on Gist {request.gist_id} with weather summary: {weather_summary}"}
+        gist_service.validate_gist(request.gist_id)
+
+        weather_summary = weather_service.get_weather_summary(
+            city=request.city,
+            country_code=request.country_code,
+            state_code=request.state_code
+        )
+
+        gist_service.create_comment(gist_id=request.gist_id, comment=weather_summary)
+
+        return {"message": f"Commented on Gist {request.gist_id} with weather summary: {weather_summary}"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Unexpected error while commenting on Gist"
+        )
+    
 

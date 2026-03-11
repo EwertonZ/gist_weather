@@ -9,3 +9,6 @@ wheels/
 # Virtual environments
 .venv
 .env
+
+# IDE and editor files
+.vscode/
