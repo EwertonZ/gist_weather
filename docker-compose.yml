@@ -1,0 +1,9 @@
+services:
+  api:
+    build: .
+    container_name: gist-weather-api
+    ports:
+      - "8000:8000"
+    environment:
+      OPENWEATHER_API_KEY: ${OPEN_WEATHER_API_KEY}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
