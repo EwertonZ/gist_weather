@@ -12,3 +12,8 @@ wheels/
 
 # IDE and editor files
 .vscode/
+
+# Tests and coverage reports
+.coverage
+htmlcov/
+*.log
