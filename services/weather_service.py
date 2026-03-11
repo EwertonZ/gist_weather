@@ -102,7 +102,7 @@ class WeatherService:
 
 ### Temperatura atual para {datetime.now().strftime('%d/%m')}
 
-{current_temp}°C e {weather_data.description.lower()} em {city.capitalize()}.
+{current_temp}°C e {weather_data.description.lower()} em {city}.
 
 ### Previsão para os próximos dias
 
