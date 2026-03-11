@@ -51,7 +51,7 @@ The API will be available at http://localhost:8000
 Visit http://localhost:8000/docs for interactive API documentation.
 
 ### API Endpoints
-##### POST /gist/{gist_id}/comment
+##### POST /gist/comment
 Creates a weather comment on the specified GitHub Gist.
 
 ###### Request Body:
