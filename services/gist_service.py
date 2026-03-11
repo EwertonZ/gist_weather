@@ -1,7 +1,10 @@
 from github.Gist import Gist
 from github import Github, Auth
 from github.GithubException import GithubException
+from core.logging import get_logger
 
+
+logger = get_logger(__name__)
 
 class GistService:
 
@@ -21,10 +24,11 @@ class GistService:
             PermissionError: If the GitHub token is invalid or lacks permissions.
             RuntimeError: For other GitHub API errors.
         """
+        logger.info("Validating Gist with ID=%s", gist_id)
         try:
             self.github.get_gist(gist_id)
         except GithubException as e:
-
+            logger.error("Error validating Gist with ID=%s: %s", gist_id, e)
             if e.status == 404:
                 raise ValueError("Gist not found")
 
@@ -53,12 +57,13 @@ class GistService:
         if not comment.strip():
             raise ValueError("Comment cannot be empty")
 
+        logger.info("Creating comment on Gist with ID=%s", gist_id)
         try:
             gist: Gist = self.github.get_gist(gist_id)
             gist.create_comment(comment)
-
+            logger.info("Comment created on Gist with ID=%s", gist_id)
         except GithubException as e:
-
+            logger.error("Error creating comment on Gist with ID=%s: %s", gist_id, e)
             if e.status == 404:
                 raise ValueError(f"Gist '{gist_id}' not found")
 

@@ -12,8 +12,10 @@ from api.docs.gist_docs import (
     COMMENT_ON_GIST_DESCRIPTION,
     COMMENT_ON_GIST_RESPONSES,
 )
+from core.logging import get_logger
 
 
+logger = get_logger(__name__)
 router: APIRouter = APIRouter(prefix="/gist", tags=["gist"])
 
 @router.post(
@@ -30,6 +32,7 @@ async def comment_on_gist(
     """
     Comment on a GitHub Gist with the current weather information for a specified location.
     """
+    logger.info("Received request to comment on Gist %s for city=%s", request.gist_id, request.city)
     try:
 
         gist_service.validate_gist(request.gist_id)
