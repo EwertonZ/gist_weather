@@ -6,6 +6,9 @@ from openweather_sdk import (
     WeatherData,
 )
 from config import OPENWEATHER_API_KEY
+from core.logging import get_logger
+
+logger = get_logger(__name__)
 
 class WeatherService:
     """
@@ -134,12 +137,15 @@ class WeatherService:
             print(summary)  # Output: "Current weather in São Paulo, SP, BR: Clear sky, 25°C..."
         """
 
+        logger.info("Fetching weather for city=%s", city)
         coordinates = self.client.get_coordinates(city, country_code, state_code)
         if not coordinates:
+            logger.warning("No coordinates found for city=%s", city)
             return f"Não foi possível encontrar informações climáticas para {city}."
         weather_data = self.client.get_current_weather(coordinates)
         forecast = self.client.get_forecast(coordinates)
         daily_means = self._group_and_get_daily_forecast_mean(forecast)
         summary = self._generate_weather_summary(city, weather_data, daily_means)
+        logger.info("Weather summary generated for city=%s", city)
         return summary
         
