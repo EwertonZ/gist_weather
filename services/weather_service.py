@@ -1,4 +1,5 @@
 from datetime import datetime
+from textwrap import dedent
 from statistics import mean
 from openweather_sdk import (
     OpenWeatherClient,
@@ -100,17 +101,18 @@ class WeatherService:
 
         forecast_summary = ", ".join(forecast_parts)
 
-        markdown_summary =f"""
-![Weather Icon](https://openweathermap.org/img/wn/{weather_data.icon}.png) 
+        markdown_summary = dedent(f"""
+            ![Weather Icon](https://openweathermap.org/img/wn/{weather_data.icon}.png) 
 
-### Temperatura atual para {datetime.now().strftime('%d/%m')}
+            ### Temperatura atual para {datetime.now().strftime('%d/%m')}
 
-{current_temp}°C e {weather_data.description.lower()} em {city}.
+            {current_temp}°C e {weather_data.description.lower()} em {city}.
 
-### Previsão para os próximos dias
+            ### Previsão para os próximos dias
 
-{forecast_summary}.
-"""
+            {forecast_summary}.
+            """
+        )
         
         return markdown_summary
 
